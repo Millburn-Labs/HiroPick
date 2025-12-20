@@ -8,6 +8,7 @@ export class HiroPickChainhooksService {
   private client: ChainhooksClient;
   private apiKey?: string;
   private jwt?: string;
+  private network: "mainnet" | "testnet";
 
   constructor(config: {
     network?: "mainnet" | "testnet";
@@ -16,6 +17,7 @@ export class HiroPickChainhooksService {
     baseUrl?: string;
   }) {
     const { network = "testnet", apiKey, jwt, baseUrl } = config;
+    this.network = network;
     
     this.apiKey = apiKey;
     this.jwt = jwt;
@@ -42,24 +44,25 @@ export class HiroPickChainhooksService {
    */
   async registerPredictionMarketHook(contractAddress: string, contractName: string) {
     try {
-      const hook = await this.client.hooks.create({
+      const hook = await this.client.registerChainhook({
         name: `hiropick-${contractName}-events`,
-        network: "stacks",
-        enabled: true,
-        filters: [
-          {
-            contract_identifier: `${contractAddress}.${contractName}`,
-            events: [
-              {
-                event_type: "contract_call",
-                contract_identifier: `${contractAddress}.${contractName}`,
-              },
-            ],
-          },
-        ],
-        webhook: {
+        version: "1",
+        chain: "stacks",
+        network: this.network,
+        options: {
+          enable_on_registration: true,
+        },
+        filters: {
+          events: [
+            {
+              type: "contract_call",
+              contract_identifier: `${contractAddress}.${contractName}`,
+            },
+          ],
+        },
+        action: {
+          type: "http_post",
           url: process.env.CHAINHOOKS_WEBHOOK_URL || "http://localhost:3000/webhook",
-          method: "POST",
         },
       });
 
@@ -75,7 +78,7 @@ export class HiroPickChainhooksService {
    */
   async listHooks() {
     try {
-      const hooks = await this.client.hooks.list();
+      const hooks = await this.client.getChainhooks();
       return hooks;
     } catch (error) {
       console.error("Error listing hooks:", error);
@@ -88,7 +91,7 @@ export class HiroPickChainhooksService {
    */
   async getHook(hookId: string) {
     try {
-      const hook = await this.client.hooks.get(hookId);
+      const hook = await this.client.getChainhook(hookId);
       return hook;
     } catch (error) {
       console.error("Error getting hook:", error);
@@ -101,7 +104,7 @@ export class HiroPickChainhooksService {
    */
   async deleteHook(hookId: string) {
     try {
-      await this.client.hooks.delete(hookId);
+      await this.client.deleteChainhook(hookId);
       return true;
     } catch (error) {
       console.error("Error deleting hook:", error);
