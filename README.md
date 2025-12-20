@@ -4,11 +4,11 @@ A decentralized prediction market built on Stacks blockchain where users can cre
 
 ## Features
 
-- 🎯 **Create Markets**: Users can create prediction markets on any future event
-- 💰 **Place Bets**: Users can bet on market outcomes (yes/no)
-- ✅ **Resolve Markets**: Market creators can resolve markets after the end date
-- 🏆 **Claim Winnings**: Winners automatically receive proportional payouts
-- 🔗 **Chainhooks Integration**: Real-time event monitoring using `@hirosystems/chainhooks-client`
+- **Create Markets**: Users can create prediction markets on any future event
+- **Place Bets**: Users can bet on market outcomes (yes/no)
+- **Resolve Markets**: Market creators can resolve markets after the end date
+- **Claim Winnings**: Winners automatically receive proportional payouts
+- **Chainhooks Integration**: Real-time event monitoring using `@hirosystems/chainhooks-client`
 
 ## Project Structure
 
