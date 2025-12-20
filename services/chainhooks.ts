@@ -104,7 +104,7 @@ export class HiroPickChainhooksService {
   /**
    * Process prediction market events from chainhook webhook
    */
-  processMarketEvent(event: any) {
+  processMarketEvent(event: any): ProcessedEvent | null {
     // Parse and process different event types
     const eventType = event.event_type;
     
@@ -119,8 +119,10 @@ export class HiroPickChainhooksService {
     }
   }
 
-  private processContractCallEvent(event: any) {
+  private processContractCallEvent(event: any): ProcessedEvent {
     const functionName = event.contract_call?.function_name;
+    const blockHeight = event.block_height ?? 0;
+    const txId = event.tx_id ?? "";
     
     // Handle different function calls
     switch (functionName) {
@@ -128,43 +130,55 @@ export class HiroPickChainhooksService {
         return {
           type: "market_created",
           data: event.contract_call?.function_args,
-          txId: event.tx_id,
-          blockHeight: event.block_height,
+          txId,
+          blockHeight,
         };
       case "place-bet":
         return {
           type: "bet_placed",
           data: event.contract_call?.function_args,
-          txId: event.tx_id,
-          blockHeight: event.block_height,
+          txId,
+          blockHeight,
         };
       case "resolve-market":
         return {
           type: "market_resolved",
           data: event.contract_call?.function_args,
-          txId: event.tx_id,
-          blockHeight: event.block_height,
+          txId,
+          blockHeight,
         };
       default:
         return {
           type: "unknown_contract_call",
-          functionName,
-          data: event.contract_call,
-          txId: event.tx_id,
+          data: { functionName, contractCall: event.contract_call },
+          txId,
+          blockHeight,
         };
     }
   }
 
-  private processStxTransferEvent(event: any) {
+  private processStxTransferEvent(event: any): ProcessedEvent {
     return {
       type: "stx_transfer",
-      sender: event.stx_transfer?.sender,
-      recipient: event.stx_transfer?.recipient,
-      amount: event.stx_transfer?.amount,
-      txId: event.tx_id,
-      blockHeight: event.block_height,
+      data: {
+        sender: event.stx_transfer?.sender,
+        recipient: event.stx_transfer?.recipient,
+        amount: event.stx_transfer?.amount,
+      },
+      txId: event.tx_id ?? "",
+      blockHeight: event.block_height ?? 0,
     };
   }
+}
+
+/**
+ * Processed event type from chainhooks
+ */
+export interface ProcessedEvent {
+  type: string;
+  data: any;
+  txId: string;
+  blockHeight: number;
 }
 
 /**
