@@ -27,10 +27,9 @@ describe("HiroPick Prediction Market", () => {
         address1
       );
 
-      // result is ParsedTransactionResult, result.result is the ClarityValue
-      const resultValue = (result as any).result || result;
-      expect(resultValue).toBeOk();
-      const marketIdCV = (resultValue as any).value;
+      // result from callPublicFn is the ClarityValue directly
+      expect(result).toBeOk(uintCV(0));
+      const marketIdCV = (result as any).value;
       expect(marketIdCV).toBeUint(0);
       const marketId = Number((marketIdCV as any).value);
 
@@ -56,8 +55,7 @@ describe("HiroPick Prediction Market", () => {
         address1
       );
 
-      const resultValue = (result as any).result || result;
-      expect(resultValue).toBeOk();
+      expect(result).toBeOk(uintCV(0));
     });
   });
 
@@ -78,7 +76,7 @@ describe("HiroPick Prediction Market", () => {
       );
 
       const resultValue = (result as any).result || result;
-      marketId = Number((resultValue as any).value.value);
+      marketId = Number((result as any).value.value);
     });
 
     it("should place a bet on yes outcome", () => {
@@ -92,9 +90,8 @@ describe("HiroPick Prediction Market", () => {
         address2
       );
 
-      const resultValue = (result as any).result || result;
-      expect(resultValue).toBeOk();
-      const betIdCV = (resultValue as any).value;
+      expect(result).toBeOk(uintCV(0));
+      const betIdCV = (result as any).value;
       expect(betIdCV).toBeUint(0);
 
       // Verify bet was placed
@@ -118,8 +115,7 @@ describe("HiroPick Prediction Market", () => {
         address2
       );
 
-      const resultValue = (result as any).result || result;
-      expect(resultValue).toBeOk();
+      expect(result).toBeOk(uintCV(0));
     });
 
     it("should fail to place bet with zero amount", () => {
@@ -144,16 +140,16 @@ describe("HiroPick Prediction Market", () => {
       const { result: result1 } = simnet.callPublicFn(
         contractName,
         "place-bet",
-        [marketId, outcome, amount],
+        [uintCV(marketId), boolCV(outcome), uintCV(amount)],
         address2
       );
-      expect(result1).toBeOk();
+      expect(result1).toBeOk(uintCV(0));
 
       // Second bet should fail
       const { result: result2 } = simnet.callPublicFn(
         contractName,
         "place-bet",
-        [marketId, outcome, amount],
+        [uintCV(marketId), boolCV(outcome), uintCV(amount)],
         address2
       );
       expect(result2).toBeErr(1008); // ERR-MARKET-ALREADY-EXISTS
@@ -166,7 +162,7 @@ describe("HiroPick Prediction Market", () => {
       simnet.callPublicFn(
         contractName,
         "place-bet",
-        [marketId, outcome, amount],
+        [uintCV(marketId), boolCV(outcome), uintCV(amount)],
         address2
       );
 
@@ -177,9 +173,8 @@ describe("HiroPick Prediction Market", () => {
         address2
       );
 
-      const statsResultValue = (statsResult.result as any) || statsResult;
-      expect(statsResultValue).toBeOk();
-      const stats = (statsResultValue as any).value;
+      expect(statsResult.result).toBeOk();
+      const stats = (statsResult.result as any).value;
       expect(stats["total-bets-yes"]).toBeUint(amount);
       expect(stats["total-bets-no"]).toBeUint(0);
     });
@@ -201,7 +196,7 @@ describe("HiroPick Prediction Market", () => {
       );
 
       const resultValue = (result as any).result || result;
-      marketId = Number((resultValue as any).value.value);
+      marketId = Number((result as any).value.value);
     });
 
     it("should resolve market as yes", () => {
@@ -214,8 +209,7 @@ describe("HiroPick Prediction Market", () => {
         address1
       );
 
-      const resultValue = (result as any).result || result;
-      expect(resultValue).toBeOk();
+      expect(result).toBeOk(boolCV(true));
 
       // Verify market is resolved
       const marketResult = simnet.callReadOnlyFn(
@@ -224,8 +218,8 @@ describe("HiroPick Prediction Market", () => {
         [uintCV(marketId)],
         address1
       );
-      const marketResultValue = (marketResult.result as any) || marketResult;
-      const market = (marketResultValue as any).value;
+      expect(marketResult.result).toBeSome();
+      const market = (marketResult.result as any).value;
       expect(market.resolved).toBe(true);
       expect(market["winning-outcome"]).toBeSome();
     });
@@ -241,8 +235,7 @@ describe("HiroPick Prediction Market", () => {
       );
 
       // Market can be resolved (end block validation is off-chain)
-      const resultValue = (result as any).result || result;
-      expect(resultValue).toBeOk();
+      expect(result).toBeOk(boolCV(true));
     });
 
     it("should fail if non-creator tries to resolve", () => {
@@ -253,7 +246,7 @@ describe("HiroPick Prediction Market", () => {
       const { result } = simnet.callPublicFn(
         contractName,
         "resolve-market",
-        [marketId, winningOutcome],
+        [uintCV(marketId), boolCV(winningOutcome)],
         address2
       );
 
@@ -277,7 +270,7 @@ describe("HiroPick Prediction Market", () => {
       );
 
       const resultValue = (result as any).result || result;
-      marketId = Number((resultValue as any).value.value);
+      marketId = Number((result as any).value.value);
 
       // Place bets
       simnet.callPublicFn(
@@ -304,10 +297,10 @@ describe("HiroPick Prediction Market", () => {
         address2
       );
 
-      const resultValue = (result as any).result || result;
-      expect(resultValue).toBeOk();
+      expect(result).toBeOk();
       // Payout should be greater than original bet
-      expect((resultValue as any).value).toBeUintGreaterThan(1000);
+      const payoutCV = (result as any).value;
+      expect(payoutCV).toBeUintGreaterThan(1000);
     });
   });
 
