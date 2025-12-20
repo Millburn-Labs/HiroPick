@@ -1,5 +1,6 @@
 import { describe, expect, it, beforeEach } from "vitest";
 import { createChainhooksService } from "../services/chainhooks.js";
+import { stringAsciiCV, uintCV, boolCV } from "@stacks/transactions";
 
 const accounts = simnet.getAccounts();
 const address1 = accounts.get("wallet_1")!;
@@ -22,19 +23,21 @@ describe("HiroPick Prediction Market", () => {
       const { result } = simnet.callPublicFn(
         contractName,
         "create-market",
-        [description, category, endBlock],
+        [stringAsciiCV(description), stringAsciiCV(category), uintCV(endBlock)],
         address1
       );
 
       expect(result).toBeOk();
-      const marketId = result.value;
-      expect(marketId).toBeUint(0);
+      // Extract the uint value from the response
+      const marketIdCV = (result as any).value;
+      expect(marketIdCV).toBeUint(0);
+      const marketId = Number((marketIdCV as any).value);
 
       // Verify market was created
       const marketResult = simnet.callReadOnlyFn(
         contractName,
         "get-market",
-        [marketId],
+        [uintCV(marketId)],
         address1
       );
       expect(marketResult.result).toBeSome();
@@ -48,7 +51,7 @@ describe("HiroPick Prediction Market", () => {
       const { result } = simnet.callPublicFn(
         contractName,
         "create-market",
-        [description, category, endBlock],
+        [stringAsciiCV(description), stringAsciiCV(category), uintCV(endBlock)],
         address1
       );
 
@@ -68,11 +71,11 @@ describe("HiroPick Prediction Market", () => {
       const { result } = simnet.callPublicFn(
         contractName,
         "create-market",
-        [description, category, endBlock],
+        [stringAsciiCV(description), stringAsciiCV(category), uintCV(endBlock)],
         address1
       );
 
-      marketId = Number(result.value);
+      marketId = Number((result as any).value.value);
     });
 
     it("should place a bet on yes outcome", () => {
@@ -82,7 +85,7 @@ describe("HiroPick Prediction Market", () => {
       const { result } = simnet.callPublicFn(
         contractName,
         "place-bet",
-        [marketId, outcome, amount],
+        [uintCV(marketId), boolCV(outcome), uintCV(amount)],
         address2
       );
 
@@ -94,7 +97,7 @@ describe("HiroPick Prediction Market", () => {
       const betResult = simnet.callReadOnlyFn(
         contractName,
         "get-bet",
-        [betId],
+        [uintCV(betId)],
         address2
       );
       expect(betResult.result).toBeSome();
@@ -107,7 +110,7 @@ describe("HiroPick Prediction Market", () => {
       const { result } = simnet.callPublicFn(
         contractName,
         "place-bet",
-        [marketId, outcome, amount],
+        [uintCV(marketId), boolCV(outcome), uintCV(amount)],
         address2
       );
 
@@ -121,7 +124,7 @@ describe("HiroPick Prediction Market", () => {
       const { result } = simnet.callPublicFn(
         contractName,
         "place-bet",
-        [marketId, outcome, amount],
+        [uintCV(marketId), boolCV(outcome), uintCV(amount)],
         address2
       );
 
@@ -165,7 +168,7 @@ describe("HiroPick Prediction Market", () => {
       const statsResult = simnet.callReadOnlyFn(
         contractName,
         "get-market-stats",
-        [marketId],
+        [uintCV(marketId)],
         address2
       );
 
@@ -187,11 +190,11 @@ describe("HiroPick Prediction Market", () => {
       const { result } = simnet.callPublicFn(
         contractName,
         "create-market",
-        [description, category, endBlock],
+        [stringAsciiCV(description), stringAsciiCV(category), uintCV(endBlock)],
         address1
       );
 
-      marketId = Number(result.value);
+      marketId = Number((result as any).value.value);
     });
 
     it("should resolve market as yes", () => {
@@ -200,7 +203,7 @@ describe("HiroPick Prediction Market", () => {
       const { result } = simnet.callPublicFn(
         contractName,
         "resolve-market",
-        [marketId, winningOutcome],
+        [uintCV(marketId), boolCV(winningOutcome)],
         address1
       );
 
@@ -210,7 +213,7 @@ describe("HiroPick Prediction Market", () => {
       const marketResult = simnet.callReadOnlyFn(
         contractName,
         "get-market",
-        [marketId],
+        [uintCV(marketId)],
         address1
       );
       const market = marketResult.result.value;
@@ -224,7 +227,7 @@ describe("HiroPick Prediction Market", () => {
       const { result } = simnet.callPublicFn(
         contractName,
         "resolve-market",
-        [marketId, winningOutcome],
+        [uintCV(marketId), boolCV(winningOutcome)],
         address1
       );
 
@@ -259,17 +262,17 @@ describe("HiroPick Prediction Market", () => {
       const { result } = simnet.callPublicFn(
         contractName,
         "create-market",
-        [description, category, endBlock],
+        [stringAsciiCV(description), stringAsciiCV(category), uintCV(endBlock)],
         address1
       );
 
-      marketId = Number(result.value);
+      marketId = Number((result as any).value.value);
 
       // Place bets
       simnet.callPublicFn(
         contractName,
         "place-bet",
-        [marketId, true, 1000],
+        [uintCV(marketId), boolCV(true), uintCV(1000)],
         address2
       );
 
@@ -277,7 +280,7 @@ describe("HiroPick Prediction Market", () => {
       simnet.callPublicFn(
         contractName,
         "resolve-market",
-        [marketId, true],
+        [uintCV(marketId), boolCV(true)],
         address1
       );
     });
@@ -286,7 +289,7 @@ describe("HiroPick Prediction Market", () => {
       const { result } = simnet.callPublicFn(
         contractName,
         "claim-winnings",
-        [marketId],
+        [uintCV(marketId)],
         address2
       );
 
