@@ -177,8 +177,11 @@ describe("HiroPick Prediction Market", () => {
       // get-market-stats returns (ok {...})
       expect(statsResult.result).toHaveClarityType(ClarityType.ResponseOk);
       const stats = (statsResult.result as any).value;
-      expect(stats["total-bets-yes"]).toBeUint(amount);
-      expect(stats["total-bets-no"]).toBeUint(0);
+      // Access tuple values using .data or direct property access
+      const totalBetsYes = stats.data?.["total-bets-yes"] || stats["total-bets-yes"];
+      const totalBetsNo = stats.data?.["total-bets-no"] || stats["total-bets-no"];
+      expect(totalBetsYes).toBeUint(amount);
+      expect(totalBetsNo).toBeUint(0);
     });
   });
 
@@ -221,10 +224,13 @@ describe("HiroPick Prediction Market", () => {
         address1
       );
       // get-market returns optional
-      expect(marketResult.result).not.toBeNone();
+      expect(marketResult.result).toHaveClarityType(ClarityType.OptionalSome);
       const market = (marketResult.result as any).value;
-      expect(market.resolved).toBe(true);
-      expect(market["winning-outcome"]).toBeSome();
+      // Access tuple values
+      const resolved = market.data?.resolved || market.resolved;
+      expect(resolved).toBe(true);
+      const winningOutcome = market.data?.["winning-outcome"] || market["winning-outcome"];
+      expect(winningOutcome).toHaveClarityType(ClarityType.OptionalSome);
     });
 
     it("can resolve market at any time (end block validation done off-chain)", () => {
@@ -303,7 +309,8 @@ describe("HiroPick Prediction Market", () => {
       // claim-winnings returns (ok u1000)
       expect(result).toHaveClarityType(ClarityType.ResponseOk);
       const payoutCV = (result as any).value;
-      expect(payoutCV).toBeUintGreaterThan(1000);
+      const payoutValue = Number((payoutCV as any).value);
+      expect(payoutValue).toBeGreaterThan(1000);
     });
   });
 
