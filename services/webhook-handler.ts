@@ -3,7 +3,7 @@
  * This can be integrated into your backend server (Express, etc.)
  */
 
-import { HiroPickChainhooksService } from "./chainhooks.js";
+import { HiroPickChainhooksService, ProcessedEvent } from "./chainhooks.js";
 import { HiroPickEventType } from "../config/chainhooks.config.js";
 
 export interface WebhookPayload {
@@ -32,12 +32,7 @@ export function processChainhookWebhook(
   payload: WebhookPayload,
   chainhooksService: HiroPickChainhooksService
 ) {
-  const events: Array<{
-    type: string;
-    data: any;
-    txId: string;
-    blockHeight: number;
-  }> = [];
+  const events: ProcessedEvent[] = [];
 
   // Process apply events
   if (payload.apply) {
