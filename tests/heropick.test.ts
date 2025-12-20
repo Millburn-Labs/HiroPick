@@ -28,8 +28,9 @@ describe("HiroPick Prediction Market", () => {
       );
 
       // result is ParsedTransactionResult, result.result is the ClarityValue
-      expect(result.result).toBeOk();
-      const marketIdCV = (result.result as any).value;
+      const resultValue = (result as any).result || result;
+      expect(resultValue).toBeOk();
+      const marketIdCV = (resultValue as any).value;
       expect(marketIdCV).toBeUint(0);
       const marketId = Number((marketIdCV as any).value);
 
@@ -55,7 +56,8 @@ describe("HiroPick Prediction Market", () => {
         address1
       );
 
-      expect(result.result).toBeOk();
+      const resultValue = (result as any).result || result;
+      expect(resultValue).toBeOk();
     });
   });
 
@@ -75,7 +77,8 @@ describe("HiroPick Prediction Market", () => {
         address1
       );
 
-      marketId = Number((result.result as any).value.value);
+      const resultValue = (result as any).result || result;
+      marketId = Number((resultValue as any).value.value);
     });
 
     it("should place a bet on yes outcome", () => {
@@ -89,9 +92,10 @@ describe("HiroPick Prediction Market", () => {
         address2
       );
 
-      expect(result.result).toBeOk();
-      const betId = result.value;
-      expect(betId).toBeUint(0);
+      const resultValue = (result as any).result || result;
+      expect(resultValue).toBeOk();
+      const betIdCV = (resultValue as any).value;
+      expect(betIdCV).toBeUint(0);
 
       // Verify bet was placed
       const betResult = simnet.callReadOnlyFn(
@@ -114,7 +118,8 @@ describe("HiroPick Prediction Market", () => {
         address2
       );
 
-      expect(result.result).toBeOk();
+      const resultValue = (result as any).result || result;
+      expect(resultValue).toBeOk();
     });
 
     it("should fail to place bet with zero amount", () => {
@@ -172,8 +177,9 @@ describe("HiroPick Prediction Market", () => {
         address2
       );
 
-      expect(statsResult.result).toBeOk();
-      const stats = statsResult.result.value;
+      const statsResultValue = (statsResult.result as any) || statsResult;
+      expect(statsResultValue).toBeOk();
+      const stats = (statsResultValue as any).value;
       expect(stats["total-bets-yes"]).toBeUint(amount);
       expect(stats["total-bets-no"]).toBeUint(0);
     });
@@ -194,7 +200,8 @@ describe("HiroPick Prediction Market", () => {
         address1
       );
 
-      marketId = Number((result.result as any).value.value);
+      const resultValue = (result as any).result || result;
+      marketId = Number((resultValue as any).value.value);
     });
 
     it("should resolve market as yes", () => {
@@ -207,7 +214,8 @@ describe("HiroPick Prediction Market", () => {
         address1
       );
 
-      expect(result.result).toBeOk();
+      const resultValue = (result as any).result || result;
+      expect(resultValue).toBeOk();
 
       // Verify market is resolved
       const marketResult = simnet.callReadOnlyFn(
@@ -216,7 +224,8 @@ describe("HiroPick Prediction Market", () => {
         [uintCV(marketId)],
         address1
       );
-      const market = marketResult.result.value;
+      const marketResultValue = (marketResult.result as any) || marketResult;
+      const market = (marketResultValue as any).value;
       expect(market.resolved).toBe(true);
       expect(market["winning-outcome"]).toBeSome();
     });
@@ -232,7 +241,8 @@ describe("HiroPick Prediction Market", () => {
       );
 
       // Market can be resolved (end block validation is off-chain)
-      expect(result.result).toBeOk();
+      const resultValue = (result as any).result || result;
+      expect(resultValue).toBeOk();
     });
 
     it("should fail if non-creator tries to resolve", () => {
@@ -266,7 +276,8 @@ describe("HiroPick Prediction Market", () => {
         address1
       );
 
-      marketId = Number((result.result as any).value.value);
+      const resultValue = (result as any).result || result;
+      marketId = Number((resultValue as any).value.value);
 
       // Place bets
       simnet.callPublicFn(
@@ -293,9 +304,10 @@ describe("HiroPick Prediction Market", () => {
         address2
       );
 
-      expect(result.result).toBeOk();
+      const resultValue = (result as any).result || result;
+      expect(resultValue).toBeOk();
       // Payout should be greater than original bet
-      expect((result.result as any).value).toBeUintGreaterThan(1000);
+      expect((resultValue as any).value).toBeUintGreaterThan(1000);
     });
   });
 
