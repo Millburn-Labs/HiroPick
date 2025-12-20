@@ -1,6 +1,6 @@
 import { describe, expect, it, beforeEach } from "vitest";
 import { createChainhooksService } from "../services/chainhooks.js";
-import { stringAsciiCV, uintCV, boolCV } from "@stacks/transactions";
+import { stringAsciiCV, uintCV, boolCV, ClarityType } from "@stacks/transactions";
 
 const accounts = simnet.getAccounts();
 const address1 = accounts.get("wallet_1")!;
@@ -40,7 +40,7 @@ describe("HiroPick Prediction Market", () => {
         [uintCV(marketId)],
         address1
       );
-      expect(marketResult.result).toBeSome();
+      expect(marketResult.result).not.toBeNone();
     });
 
     it("should create market with any end block (validation done off-chain)", () => {
@@ -93,6 +93,7 @@ describe("HiroPick Prediction Market", () => {
       expect(result).toBeOk(uintCV(0));
       const betIdCV = (result as any).value;
       expect(betIdCV).toBeUint(0);
+      const betId = Number((betIdCV as any).value);
 
       // Verify bet was placed
       const betResult = simnet.callReadOnlyFn(
@@ -101,7 +102,7 @@ describe("HiroPick Prediction Market", () => {
         [uintCV(betId)],
         address2
       );
-      expect(betResult.result).toBeSome();
+      expect(betResult.result).toHaveClarityType(ClarityType.OptionalSome);
     });
 
     it("should place a bet on no outcome", () => {
@@ -129,7 +130,7 @@ describe("HiroPick Prediction Market", () => {
         address2
       );
 
-      expect(result).toBeErr(1007); // ERR-INVALID-AMOUNT
+      expect(result).toBeErr(uintCV(1007)); // ERR-INVALID-AMOUNT
     });
 
     it("should fail to place multiple bets on same market", () => {
@@ -152,7 +153,7 @@ describe("HiroPick Prediction Market", () => {
         [uintCV(marketId), boolCV(outcome), uintCV(amount)],
         address2
       );
-      expect(result2).toBeErr(1008); // ERR-MARKET-ALREADY-EXISTS
+      expect(result2).toBeErr(uintCV(1008)); // ERR-MARKET-ALREADY-EXISTS
     });
 
     it("should update market statistics after placing bet", () => {
@@ -173,7 +174,8 @@ describe("HiroPick Prediction Market", () => {
         address2
       );
 
-      expect(statsResult.result).toBeOk();
+      // get-market-stats returns (ok {...})
+      expect(statsResult.result).toHaveClarityType(ClarityType.ResponseOk);
       const stats = (statsResult.result as any).value;
       expect(stats["total-bets-yes"]).toBeUint(amount);
       expect(stats["total-bets-no"]).toBeUint(0);
@@ -218,7 +220,8 @@ describe("HiroPick Prediction Market", () => {
         [uintCV(marketId)],
         address1
       );
-      expect(marketResult.result).toBeSome();
+      // get-market returns optional
+      expect(marketResult.result).not.toBeNone();
       const market = (marketResult.result as any).value;
       expect(market.resolved).toBe(true);
       expect(market["winning-outcome"]).toBeSome();
@@ -250,7 +253,7 @@ describe("HiroPick Prediction Market", () => {
         address2
       );
 
-      expect(result).toBeErr(1006); // ERR-UNAUTHORIZED
+      expect(result).toBeErr(uintCV(1006)); // ERR-UNAUTHORIZED
     });
   });
 
@@ -297,8 +300,8 @@ describe("HiroPick Prediction Market", () => {
         address2
       );
 
-      expect(result).toBeOk();
-      // Payout should be greater than original bet
+      // claim-winnings returns (ok u1000)
+      expect(result).toHaveClarityType(ClarityType.ResponseOk);
       const payoutCV = (result as any).value;
       expect(payoutCV).toBeUintGreaterThan(1000);
     });
