@@ -21,12 +21,20 @@ export class HiroPickChainhooksService {
     this.jwt = jwt;
 
     // Initialize chainhooks client
-    this.client = new ChainhooksClient({
+    // Only include properties that are defined to avoid undefined type errors
+    const clientConfig: {
+      network: string;
+      apiKey?: string;
+      jwt?: string;
+      baseUrl?: string;
+    } = {
       network,
-      apiKey,
-      jwt,
-      baseUrl,
-    });
+      ...(apiKey !== undefined && { apiKey }),
+      ...(jwt !== undefined && { jwt }),
+      ...(baseUrl !== undefined && { baseUrl }),
+    };
+
+    this.client = new ChainhooksClient(clientConfig as any);
   }
 
   /**
