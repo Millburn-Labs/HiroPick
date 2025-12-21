@@ -177,11 +177,9 @@ describe("HiroPick Prediction Market", () => {
       // get-market-stats returns (ok (tuple ...))
       expect(statsResult.result).toHaveClarityType(ClarityType.ResponseOk);
       const stats = (statsResult.result as any).value;
-      // Tuple CV data is accessed directly from the tuple object
-      const statsData = stats.data || stats;
-      // Access tuple fields directly
-      expect(statsData.data?.["total-bets-yes"] || statsData["total-bets-yes"]).toBeUint(amount);
-      expect(statsData.data?.["total-bets-no"] || statsData["total-bets-no"]).toBeUint(0);
+      // Tuple CV stores data in .data property, access fields directly
+      expect(stats.data["total-bets-yes"]).toBeUint(amount);
+      expect(stats.data["total-bets-no"]).toBeUint(0);
     });
   });
 
