@@ -231,10 +231,16 @@ describe("HiroPick Prediction Market", () => {
       // get-market returns optional
       expect(marketResult.result).toHaveClarityType(ClarityType.OptionalSome);
       const market = (marketResult.result as any).value;
-      // Tuple CV in Clarinet SDK: access data directly from tuple object
-      // The tuple CV has a .data property that contains the tuple fields
-      expect(market.data.resolved).toBe(true);
-      expect(market.data["winning-outcome"]).toHaveClarityType(ClarityType.OptionalSome);
+      // Tuple CV structure: check if data exists, otherwise access directly
+      // In @stacks/transactions, tuple CVs have .data property
+      if (market.data) {
+        expect(market.data.resolved).toBe(true);
+        expect(market.data["winning-outcome"]).toHaveClarityType(ClarityType.OptionalSome);
+      } else {
+        // Fallback: try accessing directly (for different SDK versions)
+        expect(market.resolved).toBe(true);
+        expect(market["winning-outcome"]).toHaveClarityType(ClarityType.OptionalSome);
+      }
     });
 
     it("can resolve market at any time (end block validation done off-chain)", () => {
