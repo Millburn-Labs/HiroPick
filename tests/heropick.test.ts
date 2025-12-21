@@ -177,14 +177,13 @@ describe("HiroPick Prediction Market", () => {
       // get-market-stats returns (ok (tuple ...))
       expect(statsResult.result).toHaveClarityType(ClarityType.ResponseOk);
       const stats = (statsResult.result as any).value;
-      // Tuple CV structure: in @stacks/transactions v7, tuple data is in .data property
-      // But Clarinet SDK might wrap it differently, so check the actual structure
+      // Tuple CV structure: in @stacks/transactions, tuple data is in .data property
+      // Debug: log structure to understand it (commented out for production)
+      // console.log("Stats structure:", JSON.stringify(stats, (k, v) => typeof v === 'bigint' ? v.toString() : v, 2));
       expect(stats.type).toBe(ClarityType.Tuple);
-      // Access tuple data - try .data first, then direct access
-      const totalBetsYes = stats.data?.["total-bets-yes"] ?? (stats as any)["total-bets-yes"];
-      const totalBetsNo = stats.data?.["total-bets-no"] ?? (stats as any)["total-bets-no"];
-      expect(totalBetsYes).toBeUint(amount);
-      expect(totalBetsNo).toBeUint(0);
+      // Access tuple data from .data property
+      expect(stats.data["total-bets-yes"]).toBeUint(amount);
+      expect(stats.data["total-bets-no"]).toBeUint(0);
     });
   });
 
@@ -229,11 +228,13 @@ describe("HiroPick Prediction Market", () => {
       // get-market returns optional
       expect(marketResult.result).toHaveClarityType(ClarityType.OptionalSome);
       const market = (marketResult.result as any).value;
-      // Tuple CV in @stacks/transactions: data is stored in .data property
-      // Access tuple fields directly
-      const marketData = market.data;
-      expect(marketData.resolved).toBe(true);
-      expect(marketData["winning-outcome"]).toHaveClarityType(ClarityType.OptionalSome);
+      // Tuple CV structure: in @stacks/transactions, tuple data is in .data property
+      // Debug: log structure to understand it (commented out for production)
+      // console.log("Market structure:", JSON.stringify(market, (k, v) => typeof v === 'bigint' ? v.toString() : v, 2));
+      expect(market.type).toBe(ClarityType.Tuple);
+      // Access tuple data from .data property
+      expect(market.data.resolved).toBe(true);
+      expect(market.data["winning-outcome"]).toHaveClarityType(ClarityType.OptionalSome);
     });
 
     it("can resolve market at any time (end block validation done off-chain)", () => {
