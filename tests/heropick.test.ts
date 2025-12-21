@@ -177,9 +177,10 @@ describe("HiroPick Prediction Market", () => {
       // get-market-stats returns (ok (tuple ...))
       expect(statsResult.result).toHaveClarityType(ClarityType.ResponseOk);
       const stats = (statsResult.result as any).value;
-      // Tuple CV stores data in .data property, access fields directly
-      expect(stats.data["total-bets-yes"]).toBeUint(amount);
-      expect(stats.data["total-bets-no"]).toBeUint(0);
+      // Access tuple fields - check both .data and direct access
+      const statsData = (stats.type === ClarityType.Tuple && stats.data) ? stats.data : stats;
+      expect(statsData["total-bets-yes"]).toBeUint(amount);
+      expect(statsData["total-bets-no"]).toBeUint(0);
     });
   });
 
@@ -224,10 +225,9 @@ describe("HiroPick Prediction Market", () => {
       // get-market returns optional
       expect(marketResult.result).toHaveClarityType(ClarityType.OptionalSome);
       const market = (marketResult.result as any).value;
-      // Tuple CV has .data property with the actual tuple data
-      const marketData = market.data;
-      expect(marketData.resolved).toBe(true);
-      expect(marketData["winning-outcome"]).toHaveClarityType(ClarityType.OptionalSome);
+      // Tuple CV stores data in .data property, access fields directly
+      expect(market.data.resolved).toBe(true);
+      expect(market.data["winning-outcome"]).toHaveClarityType(ClarityType.OptionalSome);
     });
 
     it("can resolve market at any time (end block validation done off-chain)", () => {
