@@ -226,13 +226,11 @@ describe("HiroPick Prediction Market", () => {
       // get-market returns optional
       expect(marketResult.result).toHaveClarityType(ClarityType.OptionalSome);
       const market = (marketResult.result as any).value;
-      // Tuple CV structure: in @stacks/transactions, tuple data is in .data property
-      // Debug: log structure to understand it (commented out for production)
-      // console.log("Market structure:", JSON.stringify(market, (k, v) => typeof v === 'bigint' ? v.toString() : v, 2));
+      // Tuple CV structure: in Clarinet SDK, tuple data is in .value property
       expect(market.type).toBe(ClarityType.Tuple);
-      // Access tuple data from .data property
-      expect(market.data.resolved).toBe(true);
-      expect(market.data["winning-outcome"]).toHaveClarityType(ClarityType.OptionalSome);
+      // Access tuple data from .value property
+      expect(market.value.resolved).toBe(true);
+      expect(market.value["winning-outcome"]).toHaveClarityType(ClarityType.OptionalSome);
     });
 
     it("can resolve market at any time (end block validation done off-chain)", () => {
