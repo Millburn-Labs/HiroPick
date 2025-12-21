@@ -225,9 +225,10 @@ describe("HiroPick Prediction Market", () => {
       // get-market returns optional
       expect(marketResult.result).toHaveClarityType(ClarityType.OptionalSome);
       const market = (marketResult.result as any).value;
-      // Tuple CV stores data in .data property, access fields directly
-      expect(market.data.resolved).toBe(true);
-      expect(market.data["winning-outcome"]).toHaveClarityType(ClarityType.OptionalSome);
+      // Access tuple fields - check both .data and direct access
+      const marketData = (market.type === ClarityType.Tuple && market.data) ? market.data : market;
+      expect(marketData.resolved).toBe(true);
+      expect(marketData["winning-outcome"]).toHaveClarityType(ClarityType.OptionalSome);
     });
 
     it("can resolve market at any time (end block validation done off-chain)", () => {
