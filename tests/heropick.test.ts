@@ -177,10 +177,11 @@ describe("HiroPick Prediction Market", () => {
       // get-market-stats returns (ok (tuple ...))
       expect(statsResult.result).toHaveClarityType(ClarityType.ResponseOk);
       const stats = (statsResult.result as any).value;
-      // Tuple CV has .data property with the actual tuple data
-      const statsData = stats.data || stats;
-      expect(statsData["total-bets-yes"]).toBeUint(amount);
-      expect(statsData["total-bets-no"]).toBeUint(0);
+      // Tuple CV structure: in Clarinet SDK, tuple data is in .value property
+      expect(stats.type).toBe(ClarityType.Tuple);
+      // Access tuple data from .value property
+      expect(stats.value["total-bets-yes"]).toBeUint(amount);
+      expect(stats.value["total-bets-no"]).toBeUint(0);
     });
   });
 
@@ -225,10 +226,13 @@ describe("HiroPick Prediction Market", () => {
       // get-market returns optional
       expect(marketResult.result).toHaveClarityType(ClarityType.OptionalSome);
       const market = (marketResult.result as any).value;
-      // Tuple CV has .data property with the actual tuple data
-      const marketData = market.data || market;
-      expect(marketData.resolved).toBe(true);
-      expect(marketData["winning-outcome"]).toHaveClarityType(ClarityType.OptionalSome);
+      // Tuple CV structure: in Clarinet SDK, tuple data is in .value property
+      expect(market.type).toBe(ClarityType.Tuple);
+      // Access tuple data from .value property
+      // Boolean CVs in Clarinet SDK: boolean value is in the .type property ('true' or 'false')
+      const resolvedCV = market.value.resolved;
+      expect(resolvedCV.type).toBe('true');
+      expect(market.value["winning-outcome"]).toHaveClarityType(ClarityType.OptionalSome);
     });
 
     it("can resolve market at any time (end block validation done off-chain)", () => {
