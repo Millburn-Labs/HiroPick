@@ -177,10 +177,16 @@ describe("HiroPick Prediction Market", () => {
       // get-market-stats returns (ok (tuple ...))
       expect(statsResult.result).toHaveClarityType(ClarityType.ResponseOk);
       const stats = (statsResult.result as any).value;
-      // Tuple CV in Clarinet SDK: access data directly from tuple object
-      // The tuple CV has a .data property that contains the tuple fields
-      expect(stats.data["total-bets-yes"]).toBeUint(amount);
-      expect(stats.data["total-bets-no"]).toBeUint(0);
+      // Tuple CV structure: check if data exists, otherwise access directly
+      // In @stacks/transactions, tuple CVs have .data property
+      if (stats.data) {
+        expect(stats.data["total-bets-yes"]).toBeUint(amount);
+        expect(stats.data["total-bets-no"]).toBeUint(0);
+      } else {
+        // Fallback: try accessing directly (for different SDK versions)
+        expect(stats["total-bets-yes"]).toBeUint(amount);
+        expect(stats["total-bets-no"]).toBeUint(0);
+      }
     });
   });
 
