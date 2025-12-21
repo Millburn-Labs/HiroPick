@@ -229,8 +229,13 @@ describe("HiroPick Prediction Market", () => {
       // Tuple CV structure: in Clarinet SDK, tuple data is in .value property
       expect(market.type).toBe(ClarityType.Tuple);
       // Access tuple data from .value property
-      // Boolean CVs have a .value property with the actual boolean
-      expect(market.value.resolved.value).toBe(true);
+      // Boolean CVs: check structure to extract the actual boolean value
+      const resolvedCV = market.value.resolved;
+      console.log("Resolved CV:", resolvedCV);
+      console.log("Resolved CV keys:", Object.keys(resolvedCV));
+      // Boolean CV might have value in .value or be the value itself
+      const resolvedValue = resolvedCV.value !== undefined ? resolvedCV.value : (resolvedCV.type === 'true' || resolvedCV.type === ClarityType.BoolTrue);
+      expect(resolvedValue).toBe(true);
       expect(market.value["winning-outcome"]).toHaveClarityType(ClarityType.OptionalSome);
     });
 
