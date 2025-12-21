@@ -177,16 +177,11 @@ describe("HiroPick Prediction Market", () => {
       // get-market-stats returns (ok (tuple ...))
       expect(statsResult.result).toHaveClarityType(ClarityType.ResponseOk);
       const stats = (statsResult.result as any).value;
-      // Tuple CV structure: in @stacks/transactions, tuple data is in .data property
-      // Debug: log structure to understand it
-      console.log("Stats keys:", Object.keys(stats));
-      console.log("Stats type:", stats.type);
-      console.log("Stats.data:", stats.data);
-      console.log("Stats.data keys:", stats.data ? Object.keys(stats.data) : "no data");
+      // Tuple CV structure: in Clarinet SDK, tuple data is in .value property
       expect(stats.type).toBe(ClarityType.Tuple);
-      // Access tuple data from .data property
-      expect(stats.data["total-bets-yes"]).toBeUint(amount);
-      expect(stats.data["total-bets-no"]).toBeUint(0);
+      // Access tuple data from .value property
+      expect(stats.value["total-bets-yes"]).toBeUint(amount);
+      expect(stats.value["total-bets-no"]).toBeUint(0);
     });
   });
 
