@@ -11,7 +11,7 @@ plan:
         - contract-publish:
             contract-name: heropick
             expected-sender: SP1ZE73TWJ4WBFHZBBQJAMJDV23K678RXWPDGNHYF
-            cost: 83380
+            cost: 85810
             path: contracts/heropick.clar
             anchor-block-only: true
             clarity-version: 4
