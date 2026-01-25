@@ -12,6 +12,9 @@
 (define-constant ERR-UNAUTHORIZED (err u1006))
 (define-constant ERR-INVALID-AMOUNT (err u1007))
 (define-constant ERR-MARKET-ALREADY-EXISTS (err u1008))
+(define-constant ERR-INVALID-DESCRIPTION (err u1009))
+(define-constant ERR-INVALID-CATEGORY (err u1010))
+(define-constant ERR-INVALID-END-BLOCK (err u1011))
 
 ;; data vars
 (define-data-var market-counter uint u0)
@@ -95,8 +98,10 @@
     (caller tx-sender)
     (market-id (var-get market-counter))
   )
-    ;; Note: End block validation should be done off-chain
-    ;; The end-block is stored for reference and used in resolve-market
+    ;; Input validation
+    (asserts! (> (len description) u0) ERR-INVALID-DESCRIPTION)
+    (asserts! (> (len category) u0) ERR-INVALID-CATEGORY)
+    (asserts! (> end-block stacks-block-height) ERR-INVALID-END-BLOCK)
     
     ;; Create market entry
     (map-set markets market-id {
