@@ -260,4 +260,3 @@ ISC
 
 - [Stacks Documentation](https://docs.stacks.co)
 - [Clarity Language](https://docs.stacks.co/docs/clarity)
-- [Chainhooks Documentation](https://docs.hiro.so/chainhooks)
