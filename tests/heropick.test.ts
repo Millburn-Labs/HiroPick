@@ -43,10 +43,13 @@ describe("HiroPick Prediction Market", () => {
       expect(marketResult.result).not.toBeNone();
     });
 
-    it("should create market with any end block (validation done off-chain)", () => {
+    it("should fail to create market with past end block", () => {
       const description = "Market with past end block";
       const category = "test";
-      const endBlock = 100; // Any block number (validation done off-chain)
+      const endBlock = 100; // Past block if we mine blocks
+
+      // Advance chain so 100 is in the past
+      simnet.mineEmptyBlocks(200);
 
       const { result } = simnet.callPublicFn(
         contractName,
@@ -55,7 +58,7 @@ describe("HiroPick Prediction Market", () => {
         address1
       );
 
-      expect(result).toBeOk(uintCV(0));
+      expect(result).toBeErr(uintCV(1011)); // ERR-INVALID-END-BLOCK
     });
   });
 
@@ -364,7 +367,7 @@ describe("Chainhooks Integration", () => {
         function_args: [],
       },
       tx_id: "0x123",
-      };
+    };
 
     const processed = service.processMarketEvent(mockEvent);
     expect(processed).toBeDefined();
