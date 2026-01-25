@@ -259,4 +259,3 @@ ISC
 ## Resources
 
 - [Stacks Documentation](https://docs.stacks.co)
-- [Clarity Language](https://docs.stacks.co/docs/clarity)
