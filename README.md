@@ -257,5 +257,3 @@ const payout = await contract.callPublicFn(
 ISC
 
 ## Resources
-
-- [Stacks Documentation](https://docs.stacks.co)
