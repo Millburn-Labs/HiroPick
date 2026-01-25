@@ -255,5 +255,3 @@ const payout = await contract.callPublicFn(
 ## License
 
 ISC
-
-## Resources
