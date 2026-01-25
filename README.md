@@ -261,4 +261,3 @@ ISC
 - [Stacks Documentation](https://docs.stacks.co)
 - [Clarity Language](https://docs.stacks.co/docs/clarity)
 - [Chainhooks Documentation](https://docs.hiro.so/chainhooks)
-- [Clarinet SDK](https://docs.hiro.so/stacks/clarinet-js-sdk)
