@@ -251,7 +251,3 @@ const payout = await contract.callPublicFn(
 - `1006` - Unauthorized
 - `1007` - Invalid amount
 - `1008` - Market already exists (user already placed bet)
-
-## License
-
-ISC
