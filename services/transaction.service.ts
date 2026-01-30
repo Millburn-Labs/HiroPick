@@ -5,24 +5,17 @@
 
 import {
   makeContractCall,
-  broadcastTransaction,
-  AnchorMode,
   PostConditionMode,
-  StacksNetwork,
-  StacksTestnet,
-  StacksMainnet,
-  getAddressFromPrivateKey,
-  TransactionVersion,
-  createStacksPrivateKey,
-  standardPrincipalCV,
   uintCV,
   stringAsciiCV,
   boolCV,
-  ClarityValue,
   SignedContractCallOptions,
-  broadcastTransaction as broadcastTx,
-  getNonce,
+  broadcastTransaction,
 } from "@stacks/transactions";
+import {
+  StacksNetwork,
+  createNetwork,
+} from "@stacks/network";
 import {
   getContractIdentifier,
   getStacksNetwork,
@@ -37,22 +30,13 @@ import {
 export class HiroPickTransactionService {
   private contractIdentifier: string;
   private network: StacksNetwork;
-  private networkType: Network;
 
   constructor(config: ContractConfig) {
     this.contractIdentifier = getContractIdentifier(config);
-    this.networkType = config.network;
     const networkConfig = getStacksNetwork(config.network);
     
     // Create Stacks network instance
-    if (config.network === "mainnet") {
-      this.network = new StacksMainnet({ url: networkConfig.url });
-    } else if (config.network === "testnet") {
-      this.network = new StacksTestnet({ url: networkConfig.url });
-    } else {
-      // Devnet
-      this.network = new StacksTestnet({ url: networkConfig.url });
-    }
+    this.network = createNetwork(config.network, networkConfig.url);
   }
 
   /**
@@ -68,13 +52,6 @@ export class HiroPickTransactionService {
       nonce?: number;
     }
   ) {
-    const senderAddress = getAddressFromPrivateKey(
-      options.senderKey,
-      this.networkType === "mainnet" ? TransactionVersion.Mainnet : TransactionVersion.Testnet
-    );
-
-    const nonce = options.nonce ?? (await getNonce(senderAddress, this.network));
-
     const txOptions: SignedContractCallOptions = {
       contractAddress: this.contractIdentifier.split(".")[0],
       contractName: this.contractIdentifier.split(".")[1],
@@ -86,9 +63,8 @@ export class HiroPickTransactionService {
       ],
       senderKey: options.senderKey,
       fee: options.fee,
-      nonce,
+      nonce: options.nonce,
       network: this.network,
-      anchorMode: AnchorMode.Any,
       postConditionMode: PostConditionMode.Allow,
     };
 
@@ -108,13 +84,6 @@ export class HiroPickTransactionService {
       nonce?: number;
     }
   ) {
-    const senderAddress = getAddressFromPrivateKey(
-      options.senderKey,
-      this.networkType === "mainnet" ? TransactionVersion.Mainnet : TransactionVersion.Testnet
-    );
-
-    const nonce = options.nonce ?? (await getNonce(senderAddress, this.network));
-
     const txOptions: SignedContractCallOptions = {
       contractAddress: this.contractIdentifier.split(".")[0],
       contractName: this.contractIdentifier.split(".")[1],
@@ -126,10 +95,10 @@ export class HiroPickTransactionService {
       ],
       senderKey: options.senderKey,
       fee: options.fee,
-      nonce,
+      nonce: options.nonce,
       network: this.network,
-      anchorMode: AnchorMode.Any,
       postConditionMode: PostConditionMode.Allow,
+      anchorMode: AnchorMode.Any,
       // Include STX transfer amount
       amount: amount.toString(),
     };
@@ -149,13 +118,6 @@ export class HiroPickTransactionService {
       nonce?: number;
     }
   ) {
-    const senderAddress = getAddressFromPrivateKey(
-      options.senderKey,
-      this.networkType === "mainnet" ? TransactionVersion.Mainnet : TransactionVersion.Testnet
-    );
-
-    const nonce = options.nonce ?? (await getNonce(senderAddress, this.network));
-
     const txOptions: SignedContractCallOptions = {
       contractAddress: this.contractIdentifier.split(".")[0],
       contractName: this.contractIdentifier.split(".")[1],
@@ -166,9 +128,8 @@ export class HiroPickTransactionService {
       ],
       senderKey: options.senderKey,
       fee: options.fee,
-      nonce,
+      nonce: options.nonce,
       network: this.network,
-      anchorMode: AnchorMode.Any,
       postConditionMode: PostConditionMode.Allow,
     };
 
@@ -186,13 +147,6 @@ export class HiroPickTransactionService {
       nonce?: number;
     }
   ) {
-    const senderAddress = getAddressFromPrivateKey(
-      options.senderKey,
-      this.networkType === "mainnet" ? TransactionVersion.Mainnet : TransactionVersion.Testnet
-    );
-
-    const nonce = options.nonce ?? (await getNonce(senderAddress, this.network));
-
     const txOptions: SignedContractCallOptions = {
       contractAddress: this.contractIdentifier.split(".")[0],
       contractName: this.contractIdentifier.split(".")[1],
@@ -200,9 +154,8 @@ export class HiroPickTransactionService {
       functionArgs: [uintCV(marketId)],
       senderKey: options.senderKey,
       fee: options.fee,
-      nonce,
+      nonce: options.nonce,
       network: this.network,
-      anchorMode: AnchorMode.Any,
       postConditionMode: PostConditionMode.Allow,
     };
 
@@ -214,7 +167,7 @@ export class HiroPickTransactionService {
    */
   async broadcastTransaction(transaction: any) {
     try {
-      const result = await broadcastTx(transaction, this.network);
+      const result = await broadcastTransaction(transaction);
       return result;
     } catch (error) {
       console.error("Error broadcasting transaction:", error);
