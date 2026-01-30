@@ -98,7 +98,6 @@ export class HiroPickTransactionService {
       nonce: options.nonce,
       network: this.network,
       postConditionMode: PostConditionMode.Allow,
-      anchorMode: AnchorMode.Any,
       // Include STX transfer amount
       amount: amount.toString(),
     };
