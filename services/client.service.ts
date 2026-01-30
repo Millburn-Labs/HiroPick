@@ -52,18 +52,14 @@ export class HiroPickClientService {
    */
   async connectWallet(): Promise<boolean> {
     try {
-      const appDomain = typeof window !== "undefined" 
-        ? window.location.origin 
-        : "https://hiropick.app";
-      
-      const appDomain = typeof window !== "undefined" 
-        ? window.location.origin 
-        : "https://hiropick.app";
+      const appIconUrl = typeof window !== "undefined" 
+        ? window.location.origin + "/logo.png"
+        : "https://hiropick.app/logo.png";
       
       await showConnect({
         appDetails: {
           name: "HiroPick",
-          icon: appDomain + "/logo.png",
+          icon: appIconUrl,
         },
         redirectTo: "/",
         onFinish: (data: FinishedAuthData) => {
@@ -169,6 +165,9 @@ export class HiroPickClientService {
 
     const [contractAddress, contractName] = this.contractIdentifier.split(".");
 
+    // Note: STX transfer for betting should be handled by the wallet
+    // The amount is included in the function args, and users will need to
+    // send STX with the transaction. The wallet UI will prompt for this.
     await openContractCall({
       network: this.network === "mainnet" ? "mainnet" : "testnet",
       contractAddress,
@@ -183,8 +182,6 @@ export class HiroPickClientService {
         name: "HiroPick",
         icon: (typeof window !== "undefined" ? window.location.origin : "https://hiropick.app") + "/logo.png",
       },
-      // Include STX transfer amount
-      stxAmount: amount.toString(),
       onFinish: (data) => {
         console.log("Bet placement transaction:", data);
         onFinish?.(data);
