@@ -1,3 +1,4 @@
+// @ts-ignore - ChainhooksClient export issue in type definitions
 import { ChainhooksClient } from "@hirosystems/chainhooks-client";
 
 /**
@@ -6,8 +7,6 @@ import { ChainhooksClient } from "@hirosystems/chainhooks-client";
  */
 export class HiroPickChainhooksService {
   private client: ChainhooksClient;
-  private apiKey?: string;
-  private jwt?: string;
   private network: "mainnet" | "testnet";
 
   constructor(config: {
@@ -18,9 +17,6 @@ export class HiroPickChainhooksService {
   }) {
     const { network = "testnet", apiKey, jwt, baseUrl } = config;
     this.network = network;
-    
-    this.apiKey = apiKey;
-    this.jwt = jwt;
 
     // Initialize chainhooks client
     // Only include properties that are defined to avoid undefined type errors
