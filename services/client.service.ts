@@ -5,22 +5,19 @@
 
 import {
   openContractCall,
-  openContractDeploy,
   UserSession,
   showConnect,
   AppConfig,
   FinishedTxData,
-  openSTXTransfer,
+  FinishedAuthData,
 } from "@stacks/connect";
 import {
   uintCV,
   stringAsciiCV,
   boolCV,
-  ClarityValue,
 } from "@stacks/transactions";
 import {
   getContractIdentifier,
-  getStacksNetwork,
   defaultContractConfig,
   type ContractConfig,
   type Network,
@@ -40,10 +37,6 @@ export class HiroPickClientService {
     this.network = config.network;
     
     // Configure app for Stacks Connect
-    const appDomain = typeof window !== "undefined" 
-      ? window.location.origin 
-      : "https://hiropick.app";
-    
     this.appConfig = new AppConfig(
       ["store_write", "publish_data"],
       config.network === "mainnet"
@@ -63,15 +56,21 @@ export class HiroPickClientService {
         ? window.location.origin 
         : "https://hiropick.app";
       
+      const appDomain = typeof window !== "undefined" 
+        ? window.location.origin 
+        : "https://hiropick.app";
+      
       await showConnect({
         appDetails: {
           name: "HiroPick",
           icon: appDomain + "/logo.png",
         },
         redirectTo: "/",
-        onFinish: (data: FinishedTxData) => {
+        onFinish: (data: FinishedAuthData) => {
           console.log("User data:", data);
-          window.location.reload();
+          if (typeof window !== "undefined") {
+            window.location.reload();
+          }
         },
         onCancel: () => {
           console.log("User cancelled connection");
