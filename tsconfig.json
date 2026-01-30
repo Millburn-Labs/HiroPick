@@ -19,7 +19,7 @@
     "noFallthroughCasesInSwitch": true
   },
   "include": [
-    "node_modules/@stacks/clarinet-sdk/vitest-helpers/src",
+    "services/node_modules/@stacks/clarinet-sdk/vitest-helpers/src",
     "tests",
     "services",
     "config"
