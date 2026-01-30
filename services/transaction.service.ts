@@ -21,7 +21,6 @@ import {
   getStacksNetwork,
   defaultContractConfig,
   type ContractConfig,
-  type Network,
 } from "../config/contract.config.js";
 
 /**
@@ -98,8 +97,8 @@ export class HiroPickTransactionService {
       nonce: options.nonce,
       network: this.network,
       postConditionMode: PostConditionMode.Allow,
-      // Include STX transfer amount
-      amount: amount.toString(),
+      // Note: STX transfer for betting should be handled separately
+      // Users need to send STX with the transaction when calling place-bet
     };
 
     return await makeContractCall(txOptions);
