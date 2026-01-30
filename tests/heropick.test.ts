@@ -1,6 +1,6 @@
 import { describe, expect, it, beforeEach } from "vitest";
 import { createChainhooksService } from "../services/chainhooks.js";
-import { stringAsciiCV, uintCV, boolCV, ClarityType } from "@stacks/transactions";
+import { stringAsciiCV, uintCV, boolCV, ClarityType } from "../services/node_modules/@stacks/transactions/dist/index.js";
 
 const accounts = simnet.getAccounts();
 const address1 = accounts.get("wallet_1")!;
